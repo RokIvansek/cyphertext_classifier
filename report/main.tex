@@ -1,0 +1,83 @@
+\documentclass[a4paper]{article}
+\usepackage[slovene]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern}
+\usepackage[T1]{fontenc}
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\lhead{Rok Ivanšek}
+\rhead{IŠRM, II}
+\usepackage[margin=0.8in]{geometry}
+\usepackage{algorithm}
+\usepackage{algpseudocode}
+\usepackage{amsfonts}
+\usepackage{hyperref}
+
+
+\title{Cryptography and Computer security\\
+Classifiying classical cyphers using neural networks}
+\author{Rok Ivanšek, IŠRM, II}
+\date{\today}
+
+% telo dokumenta
+\begin{document}
+
+
+
+\maketitle
+
+
+\begin{abstract}
+TODO: Write a short abstract
+\end{abstract}
+
+\section*{Data}
+
+\subsection*{Plaintexts}
+TODO: Describe how you generated the data (cyphertext) for your analysis.
+I randomly choose 1000 texts from the 20newsgroups dataset. I used the preprocesed dataset from \href{http://ana.cachopo.org/datasets-for-single-label-text-categorization}{Ana Cardoso Cachopo} \cite{2007:phd-Ana-Cardoso-Cachopo}. The preprocessing made on original texts from the 20newsgroups dataset were:
+
+\begin{itemize}	
+    \item substitute TAB, NEWLINE and RETURN characters by SPACE,
+    \item keep only letters (that is, turn punctuation, numbers, etc. into SPACES),
+    \item turn all letters to lowercase,
+    \item substitute multiple SPACES by a single SPACE,
+    \item the title/subject of each document is simply added in the beginning of the document's text.
+\end{itemize}
+
+In addition to the preprocessing already made, I took out the whitespaces and trimmed the texts to length of 1000 characters. This way I got 1000 strings of length 1000, each representing a part of a randomly selected text from the dataset. This strings were my chosen plaintexts for analysis.
+
+\subsection*{Cyphertexts}
+TODO: How did you encrypt the plaintexts.
+To encrypt the plaintexts i used the python library \href{https://github.com/jameslyons/pycipher}{pycipher}.
+
+For this analysis I chose the following encryption algorithms:
+
+\begin{itemize}
+	\item Ceasar cypher
+	\item Vigenere cypher
+	\item Hill cypher
+	\item itd.
+\end{itemize}
+
+I encrypted each plaintext with every encryption algorithm. This way I got n000 cypherthexts, 1000 for each of the choseng encrytion algorithms.
+
+\section*{Feature selection}
+TODO: Describe how you enginired features. Probably I will just use letters in order as feature i.e. each letter is a feature.
+
+
+\section*{ML techniques used}
+TODO: Describe the architecture of the NN, the activation function you used. Maybe you will do a one vs one classification i.e. for each class you train an individual NN classifier. You feed the new sample into each NN and than join results (use the normalization from OZIP).
+
+
+\section*{Results}
+TODO: Present the prediction results (accuracy) in different ways. Using different metrics (total accuracy, tp, fp, tn, fn, ...)...
+
+
+\section*{Comments}
+TODO: Comment on the prediction results. Is your method a good one?
+
+\bibliographystyle{plain}
+\bibliography{sample}
+
+\end{document} 
