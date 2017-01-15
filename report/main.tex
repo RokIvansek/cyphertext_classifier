@@ -63,8 +63,12 @@ For this analysis I chose the following encryption algorithms:
 I encrypted each plaintext with every encryption algorithm. This way I got n000 cypherthexts, 1000 for each of the choseng encrytion algorithms.
 
 \section*{Feature selection}
-TODO: Describe how you enginired features. Probably I will just use letters in order as feature i.e. each letter is a feature.
+The first idea was to just use letters in a cyphertext as features (the first letter is the first feature, the second letter the second feature, etc...) and than use deep learning (a neural network with a lot of hiddent layers) as the model. Hopefully the neural network would discover some interesting patterns and correlations in the data, that would allow it to distinguish beetween different cyphertexts. Setting up such a network is not an easy task and there is no guarantee that this method will work either, since it has not been tried in this domain yet to my knowledge. So after some initial runs of the neural network and getting really bad results I focused on engeniring useful features that would make the job easier for the classfier. \\
+I extracted the following features from the cyphertexts:
 
+\begin{itemize}
+	\item TODO: insert usefull feature here :)
+\end{itemize}
 
 \section*{ML techniques used}
 TODO: Describe the architecture of the NN, the activation function you used. Maybe you will do a one vs one classification i.e. for each class you train an individual NN classifier. You feed the new sample into each NN and than join results (use the normalization from OZIP).
