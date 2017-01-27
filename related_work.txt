@@ -1,0 +1,9 @@
+Related work:
+
+http://staging.www.isocdev.org/sites/default/files/04_1_2.pdf
+
+http://ieeexplore.ieee.org/document/5983530/
+
+http://paper.ijcsns.org/07_book/201003/20100340.pdf
+
+http://www.lbd.dcc.ufmg.br/colecoes/eniac/2013/0050.pdf
