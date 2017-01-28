@@ -1,7 +1,7 @@
 import sys
 import random
 import numpy as np
-from pycipher import Affine, Vigenere
+from pycipher import Affine, Vigenere, ADFGVX
 
 # alphabet = 'abcdefghijklmnopqrstuvwxyz'
 alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
@@ -39,6 +39,11 @@ def e_vigenere(x):
     y = vigenere.encipher(x)
     return y
 
+def e_ADFGVX(x):
+    adfgvx = ADFGVX(key='PH0QG64MEA1YL2NOFDXKR3CVS5ZW7BJ9UTI8', keyword='GERMAN')
+    y = adfgvx.encipher(x)
+    return y
+
 def encrypt(plaintexts):
     # For now use only Affine, Vigenere
     cyphertexts = []
@@ -49,36 +54,43 @@ def encrypt(plaintexts):
         y = e_affine(x)
         cyphertexts.append(y)
         labels.append("affine")
-        # Vigenere
+        # # Vigenere
         y = e_vigenere(x)
         cyphertexts.append(y)
         labels.append("vigenere")
+        # # ADFGVX
+        # y = e_ADFGVX(x)
+        # cyphertexts.append(y)
+        # labels.append("ADFGVX")
     return cyphertexts, labels
 
-def prepare_data(cyphertexts, labels):
-    X = [list(element) for element in cyphertexts]
-    X = np.array(X)
-    # Surely there is a better way...
-    for i in range(X.shape[0]):
-        for j in range(X.shape[1]):
-            X[i, j] = alphabet.index(X[i, j])
-    X = np.array(X, dtype=float)
-    y = np.array(labels)
-    return X, y
+# def prepare_data(cyphertexts, labels):
+#     X = [list(element) for element in cyphertexts]
+#     X = np.array(X)
+#     # Surely there is a better way...
+#     for i in range(X.shape[0]):
+#         for j in range(X.shape[1]):
+#             X[i, j] = alphabet.index(X[i, j])
+#     X = np.array(X, dtype=float)
+#     y = np.array(labels)
+#     return X, y
 
-def export(X, y):
-    np.save('./data/X', X)
-    np.save('./data/y', y)
+def export(cyphertexts, labels):
+    np.save('./data/cyphertexts', np.array(cyphertexts))
+    np.save('./data/labels', np.array(labels))
+    # np.save('./data/X', X)
+    # np.save('./data/y', y)
 
 if __name__ == '__main__':
-    plaintexts = get_plaintexts(sys.argv[1], 500, 10000)
+    plaintexts = get_plaintexts(sys.argv[1], 500, 1000)
     print("number of plaintexts:", len(plaintexts))
     cyphertexts, labels = encrypt(plaintexts)
     print(len(cyphertexts))
     print(len(labels))
     print(cyphertexts[0], labels[0])
     print(cyphertexts[1], labels[1])
-    X, y = prepare_data(cyphertexts, labels)
-    print(X)
-    print(y)
-    export(X, y)
+    export(cyphertexts, labels)
+    # X, y = prepare_data(cyphertexts, labels)
+    # print(X)
+    # print(y)
+    # export(X, y)

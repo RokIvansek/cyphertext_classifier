@@ -49,9 +49,28 @@ In addition to the preprocessing already made, I took out the whitespaces and tr
 
 \subsection*{Cyphertexts}
 TODO: How did you encrypt the plaintexts.
-To encrypt the plaintexts i used the python library \href{https://github.com/jameslyons/pycipher}{pycipher}.
+To encrypt the plaintexts I used the python library \href{https://github.com/jameslyons/pycipher}{pycipher}.
 
 For this analysis I chose the following encryption algorithms:
+
+\subsection{Vigenere cypher}
+\TODO: Short description of the Vigenere cypher.
+
+The Vigenere cypher has the following properties:
+
+\begin{itemize}
+	\item 
+\end{itemize}
+
+\subsection{Affine cypher}
+\TODO: Short description of the Affine cypher.
+
+The Affine cypher has the following properties:
+
+\begin{itemize}
+	\item 
+\end{itemize}
+
 
 \begin{itemize}
 	\item Ceasar cypher
@@ -62,9 +81,9 @@ For this analysis I chose the following encryption algorithms:
 
 I encrypted each plaintext with every encryption algorithm. This way I got n000 cypherthexts, 1000 for each of the choseng encrytion algorithms.
 
-\section*{Feature selection}
+\section*{Feature engineering}
 The first idea was to just use letters in a cyphertext as features (the first letter is the first feature, the second letter the second feature, etc...) and than use deep learning (a neural network with a lot of hiddent layers) as the model. Hopefully the neural network would discover some interesting patterns and correlations in the data, that would allow it to distinguish beetween different cyphertexts. Setting up such a network is not an easy task and there is no guarantee that this method will work either, since it has not been tried in this domain yet to my knowledge. So after some initial runs of the neural network and getting really bad results I focused on engeniring useful features that would make the job easier for the classfier. \\
-I extracted the following features from the cyphertexts:
+Taking into account the properties of the encryption algorithms used I extracted the following features from the cyphertexts:
 
 \begin{itemize}
 	\item TODO: insert usefull feature here :)
