@@ -1,2 +1,2 @@
 # cyphertext_classifier
-Classifying cyphertexts using neural networks.
+Classifying cyphertexts using random forest classifier.

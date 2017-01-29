@@ -1,7 +1,8 @@
 import sys
 import random
 import numpy as np
-from pycipher import Affine, Vigenere, ADFGVX
+import pycipher
+import re
 
 # alphabet = 'abcdefghijklmnopqrstuvwxyz'
 alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
@@ -27,38 +28,51 @@ def get_plaintexts(filepath, l, n):
 def e_affine(x):
     bs = list(range(26))
     aas = [1, 3, 5, 7, 9, 11, 15, 17, 19, 21, 23, 25]
-    affine = Affine(a=random.choice(aas), b=random.choice(bs))  # Encrypt with random keys
+    affine = pycipher.Affine(a=random.choice(aas), b=random.choice(bs))  # Encrypt with random keys
     y = affine.encipher(x)
     return y
 
 def e_vigenere(x):
     l = random.choice(list(range(1, 20))) #hardcoded that the key length is between 1 and 20 char long
-    keyVigenere = [random.choice(alphabet) for _ in range(l)]
-    keyVigenere = ''.join(keyVigenere)
-    vigenere = Vigenere(keyVigenere)
+    key_vigenere = [random.choice(alphabet) for _ in range(l)]
+    key_vigenere = ''.join(key_vigenere)
+    vigenere = pycipher.Vigenere(key_vigenere)
     y = vigenere.encipher(x)
     return y
 
 def e_ADFGVX(x):
-    adfgvx = ADFGVX(key='PH0QG64MEA1YL2NOFDXKR3CVS5ZW7BJ9UTI8', keyword='GERMAN')
+    # TODO: Fix so that key and keyword will be random.
+    adfgvx = pycipher.ADFGVX(key='PH0QG64MEA1YL2NOFDXKR3CVS5ZW7BJ9UTI8', keyword='GERMAN')
     y = adfgvx.encipher(x)
     return y
 
+def e_ceasar(x):
+    key_c = random.choice(range(1,25))
+    ceasar = pycipher.Caesar(key=key_c)
+    y = ceasar.encipher(x)
+    return y
+
+def e_permutation(x):
+    key_p = ''.join(random.sample(alphabet,len(alphabet)))
+    return pycipher.SimpleSubstitution(key=key_p).encipher(x)
+
 def encrypt(plaintexts):
-    # For now use only Affine, Vigenere
     cyphertexts = []
     labels = []
-    # Vigenere
+    encryptions = [e_affine, e_ceasar, e_ADFGVX, e_vigenere, e_permutation]
     for x in plaintexts:
-        # Affine
-        y = e_affine(x)
-        cyphertexts.append(y)
-        labels.append("affine")
-        # # Vigenere
-        y = e_vigenere(x)
-        cyphertexts.append(y)
-        labels.append("vigenere")
-        # # ADFGVX
+        for encryption in encryptions:
+            cyphertexts.append(encryption(x))
+            labels.append(re.search('function e_(.*) at', str(encryption)).group(1))
+        # # Affine
+        # y = e_affine(x)
+        # cyphertexts.append(y)
+        # labels.append("affine")
+        # # # Vigenere
+        # y = e_vigenere(x)
+        # cyphertexts.append(y)
+        # labels.append("vigenere")
+        # # # ADFGVX
         # y = e_ADFGVX(x)
         # cyphertexts.append(y)
         # labels.append("ADFGVX")
@@ -87,8 +101,9 @@ if __name__ == '__main__':
     cyphertexts, labels = encrypt(plaintexts)
     print(len(cyphertexts))
     print(len(labels))
-    print(cyphertexts[0], labels[0])
-    print(cyphertexts[1], labels[1])
+    for i in range(len(np.unique(labels))):
+        print("Example of", labels[i], "cypher.")
+        print(cyphertexts[i])
     export(cyphertexts, labels)
     # X, y = prepare_data(cyphertexts, labels)
     # print(X)
