@@ -31,6 +31,13 @@ def count_adjacent_duplicates(cyphertexts):
         counts.append(counter)
     return np.array(counts).reshape((len(cyphertexts), 1))
 
+# TODO: Find a fast way to do this.
+# def count_repeating_subtrings(cyphertexts, lengths):
+#     for l in lengths:
+#
+
+
+
 def combine_and_export():
     X = np.hstack((count_letters(cyphertexts),
                    count_adjacent_duplicates(cyphertexts)))
