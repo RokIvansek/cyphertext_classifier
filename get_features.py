@@ -31,20 +31,40 @@ def count_adjacent_duplicates(cyphertexts):
         counts.append(counter)
     return np.array(counts).reshape((len(cyphertexts), 1))
 
-# TODO: Find a fast way to do this.
-# def count_repeating_subtrings(cyphertexts, lengths):
-#     for l in lengths:
-#
+# TODO: Find a fast way to do this for arbitrary length of substring.
+def count_repeating_digrams(cyphertexts):
+    counts = []
+    for c in cyphertexts:
+        count = 0
+        for i in range(len(alphabet)):
+            for j in range(len(alphabet)):
+                seq = alphabet[i] + alphabet[j]
+                count += c.count(seq)
+        counts.append(count)
+    return np.array(counts).reshape((len(cyphertexts), 1))
 
-
+def index_of_coincidence(cyphertexts):
+    iocs = []
+    for c in cyphertexts:
+        l = len(c)
+        freqs = np.array([c.count(letter) for letter in alphabet])
+        row = [np.sum([(f*(f-1))/(l*(l-1)) for f in freqs])]
+        iocs.append(row)
+    return np.array(iocs)
 
 def combine_and_export():
     X = np.hstack((count_letters(cyphertexts),
-                   count_adjacent_duplicates(cyphertexts)))
+                   count_adjacent_duplicates(cyphertexts),
+                   index_of_coincidence(cyphertexts),
+                   count_repeating_digrams(cyphertexts)))
     np.save('./data/X', X)
 
 if __name__ == '__main__':
     cyphertexts, labels = import_data()
     combine_and_export()
+    # print(count_repeating_digrams(cyphertexts))
+    # iocs = index_of_coincidence(cyphertexts, (4,10))
+    # print(iocs.shape)
+    # print(iocs)
     # print(cyphertexts.shape, labels.shape)
     # print(cyphertexts[0], labels[0])

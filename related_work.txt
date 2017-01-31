@@ -1,9 +1,14 @@
 Related work:
 
 http://staging.www.isocdev.org/sites/default/files/04_1_2.pdf
+	Mogoče prezahteven
 
 http://ieeexplore.ieee.org/document/5983530/
+	Poskusi najdit dostop do tega.
 
 http://paper.ijcsns.org/07_book/201003/20100340.pdf
+	Tu si precej pobral. Predvsem feature engineering.
+	Tega še enkrat podrobno preberi.
 
 http://www.lbd.dcc.ufmg.br/colecoes/eniac/2013/0050.pdf
+	Ta izgleda zanimiv. Preberi še tega.

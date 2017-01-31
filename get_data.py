@@ -46,10 +46,15 @@ def e_permutation(x):
     key_p = ''.join(random.sample(alphabet,len(alphabet)))
     return pycipher.SimpleSubstitution(key=key_p).encipher(x)
 
+def e_playfair(x):
+    key = list('ABCDEFGHIJKLMNOPQRSTUVWXYZ')
+    random.shuffle(key)
+    return pycipher.Playfair(str(key)).encipher(x)
+
 def encrypt(plaintexts):
     cyphertexts = []
     labels = []
-    encryptions = [e_affine, e_ceasar, e_ADFGVX, e_vigenere, e_permutation]
+    encryptions = [e_affine, e_ceasar, e_ADFGVX, e_vigenere, e_permutation, e_playfair]
     for x in plaintexts:
         for encryption in encryptions:
             cyphertexts.append(encryption(x))

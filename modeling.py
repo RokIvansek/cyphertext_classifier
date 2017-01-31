@@ -12,11 +12,11 @@ def train_classifier_and_predict():
     y = le.fit_transform(y)
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.2, random_state = 42)
 
-    # clf = MLPClassifier(activation = 'relu', alpha=1e-5, hidden_layer_sizes = (30,30), random_state = 1)
+    # clf = MLPClassifier(activation = 'relu', alpha=1e-5, hidden_layer_sizes = (100,200,100), random_state = 1)
     # clf.fit(X_train, y_train)
     # pred = clf.predict(X_test)
 
-    rf = RandomForestClassifier(n_estimators=1000, n_jobs=-1)
+    rf = RandomForestClassifier(n_estimators=1000, criterion='entropy', n_jobs=-1)
     rf.fit(X_train, y_train)
     pred = rf.predict(X_test)
 
