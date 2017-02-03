@@ -12,6 +12,12 @@
 \usepackage{algpseudocode}
 \usepackage{amsfonts}
 \usepackage{hyperref}
+\usepackage{color}
+
+\usepackage{graphicx}
+\usepackage{caption}
+\usepackage{subcaption}
+\usepackage{float}
 
 \title{Cryptography and Computer security\\
 Classifiying classical cyphers using random forest}
@@ -30,8 +36,8 @@ Classifiying classical cyphers using random forest}
 When encrypting a plaintext into a cyphertext, the idea is to hide the actual content of the underlying message, thus making it unreadable for a potential harmful adversary. Cyphertexts are therefore ``gibberish'' texts that do not show any structure that would resemble a natural language. Despite this fact, we can still find patterns in the cyphertexts. The patterns are clearer, when the underlying encryption rule is more transparent, like in the case of classical cyphers. In this report I show that we can use this patterns to match a set of cyphertexts to the corresponding cypher. By carefully engineering features we can use a random forest technique to train a classifier model that is able to classify cyphertexts of classical cyphers.
 \end{abstract}
 
-\section*{Introduction/Overview}
-In my work I followed the typical data sciene pipeline. Getting the data, cleaning it, engineering features, doing some exploratory data analysis, training and tuning the model and in the end interpreting results and extracting information. This steps are presented in detail in the rest of the report.
+\section*{Introduction and related work}
+In my work I followed the typical data sciene pipeline. Getting the data, cleaning it, engineering features, doing some exploratory data analysis, training and tuning the model and in the end interpreting results and extracting information. In this domain classification has been attempted for classical substitution ciphers using a neural network \cite{sivagurunathan2010classification}, modern block cyphers like DES, 3DES and AES using support vector machines \cite{dileep2006identification}. Another aproach was used in \cite{maheshwari2001classification} for both classical and modern cyphers. In \cite{mishra2013pattern} different methods were combined to classify modern block and stream ciphers and a clustering study was done for cyphers from the finalists of the AES contest in 2000 \cite{decipher}.
 
 \section*{Data}
 
@@ -51,7 +57,7 @@ For my plaintexts I randomly choose 1000 texts from the 20newsgroups dataset. I 
 In addition to the preprocessing already made, I took out the whitespaces and trimmed the texts to length of 1000 characters. This way I got 1000 strings of length 1000, each representing a part of a randomly selected text from the dataset. This strings were my plaintexts used in the analysis.
 
 \subsection*{Cyphertexts}
-To encrypt the plaintexts I used the python library \href{https://github.com/jameslyons/pycipher}{pycipher}. To make the classification task as representative as possible, I tried to choose a variety of different cyphers. Including some that would produce simmilar cyphertexts, like the permutation and Caesar cypher and some whose cyphertexts are clearly distinguishable from each other, like the ADFGVX and the Vigenere cypher. While encrypting the key of the cypher was always chosen randomly out of all posible combinations, except where stated differently. I encrypted each plaintext with every chosen cipher. This way I got $6000$ cipherthexts, a $1000$ for each of the chosen ciphers. I ended up choosing the following cyphers.\\
+To encrypt the plaintexts I used the python library \href{https://github.com/jameslyons/pycipher}{pycipher} \textcolor{red}{TODO include a citation for pycipher here}. To make the classification task as representative as possible, I tried to choose a variety of different cyphers. Including some that would produce simmilar cyphertexts, like the permutation and Caesar cypher and some whose cyphertexts are clearly distinguishable from each other, like the ADFGVX and the Vigenere cypher. While encrypting the key of the cypher was always chosen randomly out of all posible combinations, except where stated differently. I encrypted each plaintext with every chosen cipher. This way I got $6000$ cipherthexts, a $1000$ for each of the chosen ciphers. I ended up choosing the following cyphers.\\
 \\
 In the description of the cyphers I will always assume that $x = (x_{1}, x_{2}, ...,x_{m})$ is a plaintext consisting of $m$ integers from $\mathbb{Z}_{26}$ which map to letters in the english alphabet.
 
@@ -83,18 +89,82 @@ meaning a letter in the left string would encrypt into a letter in the right str
 \subsubsection*{Playfair cipher}
 The Playfair cipher is a digraph substitution cipher from the 19th century that was also used in the World War 1 by the British forces. It encrypts pairs (digraphs) of letters using a key square. Again the full description of the encryption is too long to include in this report.\\
 \\
-TODO: Add descriptions if necesary.
+\textcolor{red}{TODO: Add descriptions if necesary.}
 
 
 \section*{Feature engineering}
 %The first idea was to just use letters in a ciphertext as features (the first letter is the first feature, the second letter the second feature, etc...) and than use deep learning (a neural network with a lot of hiddent layers) as the model. Hopefully the neural network would discover some interesting patterns and correlations in the data, that would allow it to distinguish beetween different ciphertexts. Setting up such a network is not an easy task and there is no guarantee that this method will work either, since it has not been tried in this domain yet to my knowledge. So after some initial runs of the neural network and getting really bad results I focused on engeniring useful features that would make the job easier for the classfier. \\
-TODO: Write a short introduction about the importance of features and what was your reasoning for choosing the ones you did. You should quote here the most.
-Taking into account the properties of the encryption algorithms used, I extracted the following features from the ciphertexts:
+\textcolor{red}{TODO: Write a short introduction about the importance of features and what was your reasoning for choosing the ones you did. You should quote when necesary.}\\
+\\
+In order to express patterns in the cyphertexts I had to come up with interesting features. A feature is in essence any property of the cyphertexts that can be expressed in a qualitative or a quanititative way. The features that I decided to use are closely related to the properties of the cyphers I choose. They are mostly quantitative measurements that are used, when one attempts to break the chosen cyphers.
 
 \subsubsection*{Distribution of letters}
+The first most simple group of features one can extract is the distribution of letters. This just means that we count, how many times each letter appears in the cyphertext. This way we obtain $26$ features, one for each letter in the alphatbet. Using only this simple froup of features we would allready be able to distinguish between some of the ciphers that use only a subset of letters from the alphabet, like the ADFGVX from other ciphers that use the whole alphabet.
+
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}[h]{0.5\textwidth}
+    		\centering
+        \includegraphics[height=2.5in]{img/affine_dist.png}
+    \end{subfigure}%
+    ~
+    \begin{subfigure}[h]{0.5\textwidth}
+	    \centering
+        \includegraphics[height=2.5in]{img/adfgvx_dist.png}
+    \end{subfigure}
+    \caption{Average distribution of letters in the cyphertexts for the Affine cipher (left) and the ADFGVX cipher (right).}
+    %\cite{g2:NPMP_prosojnice_mraz_biomodeliranje}}
+    \label{fig:letter_dist}
+\end{figure}
+
 \subsubsection*{Adjacent duplicates}
-\subsubsection*{Repeating digrams}
+Another simple feature that proved to be efficient in a simmilar cyphertexts classification task \cite{sivagurunathan2010classification} is the number of adjacent duplicates. It is particulary usefull when recognizing the Playfair cipher, since this cipher should have a substantially lower number of adjacent duplicates than other ciphers, due to its encryption rule.
+
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}[h]{0.5\textwidth}
+        \centering
+        \includegraphics[height=2.5in]{img/no_adj_dups_log.png}
+    \end{subfigure}
+    \caption{Logarithm of the average number of adjacent duplicates for the used ciphers.}
+    \label{fig:adj_dups}
+\end{figure}
+
+\subsubsection*{Repeating bigrams}
+In a classical text classfication an $n$-gram (usually a bigram) is a sequence of $n$ adjacent tokens in a text. Tokens can be words, syllables or letters. Using bigrams of letters I extracted two features. First was the number of unique bigrams that repeat at least once in a ciphertext and second was the frequency of the most frequent bigram in a cyphertext.
+
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}[h]{0.5\textwidth}
+    		\centering
+        \includegraphics[height=2.5in]{img/bigrams_1.png}
+    \end{subfigure}%
+    ~
+    \begin{subfigure}[h]{0.5\textwidth}
+	    \centering
+        \includegraphics[height=2.5in]{img/bigrams_2.png}
+    \end{subfigure}
+    \caption{Average number of unique repeating bigrams (left) and the average frequency of the most appearing bigram (right) in the ciphertexts.}
+    %\cite{g2:NPMP_prosojnice_mraz_biomodeliranje}}
+    \label{fig:bigrams}
+\end{figure}
+
 \subsubsection*{Index of coincidence}
+Index of coincidence (IC) along with Kasiski's test is used in breaking the Vigenere cypher. It tells us the probability that we will get two matching letters, if we randomly select two letters from a given text. The formula for calculating the IC for a text $x$ is
+$$IC(x) = \sum_{i=0}^{25} \frac{f_{i}(f_{i}-1)}{d(d-1)}, $$
+where $f_{i}$ are the frequencies of letters in $x$ and $d$ is the length of $x$.
+
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}[h]{0.5\textwidth}
+        \centering
+        \includegraphics[height=2.5in]{img/iocs.png}
+    \end{subfigure}
+    \caption{Average index of coincidence.}
+    \label{fig:ioc}
+\end{figure}
+
+The IC of an English plaintext is approximately $0.065$. The Affine, Caesar and Permutation ciphers are examples of single letter substitution ciphers, where the mapping that determines the encrypion of letters is bijective (one-to-one). It is therefore no surprise that the IC of their ciphertexts is the same as the IC of the English plaintexts.
 
 \section*{Exploratory data analysis}
 TODO: Include some graphs to show if chosen features are good and can be used to distinguish between the classes. Do a clustering study. Show scatterplots, bargraphs.
@@ -109,6 +179,7 @@ TODO: Present the prediction results (accuracy) in different ways. Using differe
 
 \section*{Comments}
 TODO: Comment on the prediction results. Is your method a good one?
+TODO: Cite sklearn, Stinsons book, practical cryptography website, matplotlib, pycipher library.
 
 \bibliographystyle{plain}
 \bibliography{sample}

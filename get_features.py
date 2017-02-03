@@ -18,45 +18,65 @@ def encode_letters_as_features(cyphertexts, labels):
     y = np.array(labels)
     return X, y
 
-def count_letters(cpyhertexts):
+def count_letters(cyphertexts, export=False):
     # X = np.zeros((cyphertexts.shape[0], len(alphabet)))
-    return np.array([[c.count(letter) for letter in alphabet] for c in cyphertexts])
+    X = np.array([[c.count(letter) for letter in alphabet] for c in cyphertexts])
+    if export:
+        np.save('./data/dist_of_letters', X)
+    return X
 
-def count_adjacent_duplicates(cyphertexts):
+def count_adjacent_duplicates(cyphertexts, export=False):
     counts = []
     for c in cyphertexts:
         counter = 0
         for i in range(len(c)-1):
             if c[i] == c[i+1]: counter += 1
         counts.append(counter)
-    return np.array(counts).reshape((len(cyphertexts), 1))
+    X = np.array(counts).reshape((len(cyphertexts), 1))
+    if export:
+        np.save('./data/no_adj_dups', X)
+    return X
 
 # TODO: Find a fast way to do this for arbitrary length of substring.
-def count_repeating_digrams(cyphertexts):
+# Counts the digrams that repeat at least one and gives the no of repeats for the most freaquent digram
+def count_repeating_bigrams(cyphertexts, export=False):
     counts = []
+    maxis = []
     for c in cyphertexts:
         count = 0
+        maxi = 0
         for i in range(len(alphabet)):
             for j in range(len(alphabet)):
                 seq = alphabet[i] + alphabet[j]
-                count += c.count(seq)
+                n = c.count(seq)
+                if n > 0:
+                    count += 1
+                if n > maxi:
+                    maxi = n
         counts.append(count)
-    return np.array(counts).reshape((len(cyphertexts), 1))
+        maxis.append(maxi)
+    X = np.column_stack((counts, maxis))
+    if export:
+        np.save('./data/digrams', np.array(X))
+    return X
 
-def index_of_coincidence(cyphertexts):
+def index_of_coincidence(cyphertexts, export=False):
     iocs = []
     for c in cyphertexts:
         l = len(c)
         freqs = np.array([c.count(letter) for letter in alphabet])
         row = [np.sum([(f*(f-1))/(l*(l-1)) for f in freqs])]
         iocs.append(row)
-    return np.array(iocs)
+    X = np.array(iocs)
+    if export:
+        np.save('./data/iocs', X)
+    return X
 
 def combine_and_export():
     X = np.hstack((count_letters(cyphertexts),
                    count_adjacent_duplicates(cyphertexts),
                    index_of_coincidence(cyphertexts),
-                   count_repeating_digrams(cyphertexts)))
+                   count_repeating_bigrams(cyphertexts)))
     np.save('./data/X', X)
 
 if __name__ == '__main__':

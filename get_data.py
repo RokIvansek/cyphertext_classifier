@@ -47,9 +47,9 @@ def e_permutation(x):
     return pycipher.SimpleSubstitution(key=key_p).encipher(x)
 
 def e_playfair(x):
-    key = list('ABCDEFGHIJKLMNOPQRSTUVWXYZ')
+    key = list('ABCDEFGHIKLMNOPQRSTUVWXYZ')
     random.shuffle(key)
-    return pycipher.Playfair(str(key)).encipher(x)
+    return pycipher.Playfair(''.join(key)).encipher(x)
 
 def encrypt(plaintexts):
     cyphertexts = []
