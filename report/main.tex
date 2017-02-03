@@ -1,5 +1,5 @@
 \documentclass[a4paper]{article}
-\usepackage[slovene]{babel}
+\usepackage[slovene, english]{babel}
 \usepackage[utf8]{inputenc}
 \usepackage{lmodern}
 \usepackage[T1]{fontenc}
@@ -13,9 +13,8 @@
 \usepackage{amsfonts}
 \usepackage{hyperref}
 
-
 \title{Cryptography and Computer security\\
-Classifiying classical cyphers using neural networks}
+Classifiying classical cyphers using random forest}
 \author{Rok Ivanšek, IŠRM, II}
 \date{\today}
 
@@ -28,16 +27,19 @@ Classifiying classical cyphers using neural networks}
 
 
 \begin{abstract}
-TODO: Write a short abstract
+When encrypting a plaintext into a cyphertext, the idea is to hide the actual content of the underlying message, thus making it unreadable for a potential harmful adversary. Cyphertexts are therefore ``gibberish'' texts that do not show any structure that would resemble a natural language. Despite this fact, we can still find patterns in the cyphertexts. The patterns are clearer, when the underlying encryption rule is more transparent, like in the case of classical cyphers. In this report I show that we can use this patterns to match a set of cyphertexts to the corresponding cypher. By carefully engineering features we can use a random forest technique to train a classifier model that is able to classify cyphertexts of classical cyphers.
 \end{abstract}
+
+\section*{Introduction/Overview}
+In my work I followed the typical data sciene pipeline. Getting the data, cleaning it, engineering features, doing some exploratory data analysis, training and tuning the model and in the end interpreting results and extracting information. This steps are presented in detail in the rest of the report.
 
 \section*{Data}
 
 \subsection*{Plaintexts}
-TODO: How did you generate the data (plaitexts)
-I randomly choose 1000 texts from the 20newsgroups dataset. I used the preprocesed dataset from \href{http://ana.cachopo.org/datasets-for-single-label-text-categorization}{Ana Cardoso Cachopo} \cite{2007:phd-Ana-Cardoso-Cachopo}. The preprocessing made on original texts from the 20newsgroups dataset were:
+For my plaintexts I randomly choose 1000 texts from the 20newsgroups dataset. I used the preprocesed dataset from \href{http://ana.cachopo.org/datasets-for-single-label-text-categorization}{Ana Cardoso Cachopo} \cite{2007:phd-Ana-Cardoso-Cachopo}. The preprocessing made on original texts from the 20newsgroups dataset was:
 
 \begin{itemize}	
+	\setlength\itemsep{-0.2em}
     \item substitute TAB, NEWLINE and RETURN characters by SPACE,
     \item keep only letters (that is, turn punctuation, numbers, etc. into SPACES),
     \item turn all letters to lowercase,
@@ -45,52 +47,60 @@ I randomly choose 1000 texts from the 20newsgroups dataset. I used the preproces
     \item the title/subject of each document is simply added in the beginning of the document's text.
 \end{itemize}
 
-In addition to the preprocessing already made, I took out the whitespaces and trimmed the texts to length of 1000 characters. This way I got 1000 strings of length 1000, each representing a part of a randomly selected text from the dataset. This strings were my chosen plaintexts for analysis.
+
+In addition to the preprocessing already made, I took out the whitespaces and trimmed the texts to length of 1000 characters. This way I got 1000 strings of length 1000, each representing a part of a randomly selected text from the dataset. This strings were my plaintexts used in the analysis.
 
 \subsection*{Cyphertexts}
-TODO: How did you encrypt the plaintexts.
-To encrypt the plaintexts I used the python library \href{https://github.com/jameslyons/pycipher}{pycipher}.
+To encrypt the plaintexts I used the python library \href{https://github.com/jameslyons/pycipher}{pycipher}. To make the classification task as representative as possible, I tried to choose a variety of different cyphers. Including some that would produce simmilar cyphertexts, like the permutation and Caesar cypher and some whose cyphertexts are clearly distinguishable from each other, like the ADFGVX and the Vigenere cypher. While encrypting the key of the cypher was always chosen randomly out of all posible combinations, except where stated differently. I encrypted each plaintext with every chosen cipher. This way I got $6000$ cipherthexts, a $1000$ for each of the chosen ciphers. I ended up choosing the following cyphers.\\
+\\
+In the description of the cyphers I will always assume that $x = (x_{1}, x_{2}, ...,x_{m})$ is a plaintext consisting of $m$ integers from $\mathbb{Z}_{26}$ which map to letters in the english alphabet.
 
-For this analysis I chose the following encryption algorithms:
+\subsubsection*{Affine cypher}
+The affine cipher is in escence a standard substitusion cypher, meaning that each letter encrypts to one other letter. The key are integers $a$ and $b$. The encryption rule is
+$$e(x_{i}) = (ax_{i} + b) \;(\bmod\; 26), \forall i$$
+where $a$ is relatively prime to $26$ and $b$ is an arbitrary integer in range $0-25$.
 
-\subsection{*Vigenere cypher}
-\TODO: Short description of the Vigenere cypher.
+%http://www.practicalcryptography.com/ciphers/affine-cipher/
+%https://en.wikipedia.org/wiki/Affine_cipher
 
-The Vigenere cypher has the following properties:
+\subsubsection*{Vigenere cypher}
+The Vigenere cipher originates from the 16th century. It encrypts the ciphertexts in blocks of $n$ characters. For a chosen keyword $K = (k_{1}, k_{2}, ..., k_{n})$ of length $n < m$, it encrypts the plaintext following the rule
+$$e(x_{1}, x_{2}, ...,x_{m}) = (x_{1}+k_{1}, x_{2}+k_{2}, ..., x_{n}+k_{n}, x_{n+1}+k_{1}, ...,x_{2n}+k_{n}, x_{2n+1} + k_{1}, ...),$$
+where all $+$ operations are done $(\bmod\; 26)$.
 
-\begin{itemize}
-	\item 
-\end{itemize}
+\subsubsection*{ADFGVX cipher}
+The ADFGVX was a field cyphter used by the German Army during World War 1. It uses a modified Polybius square and a single columnar transposition to encrypt the plaintext. The complete procedure of encryption is too long to describe in this report. The important properties of this cipher are that it uses only the letters A,D,F,G,V and X in the ciphertexts and the ciphertext is two times as long as the plaintext. 
 
-\subsection{*Affine cypher}
-\TODO: Short description of the Affine cypher.
+\subsubsection*{Caesar cipher}
+The Caesar cipher is one of the earliest known and simplest ciphers. It is a shift cipher that shifts all the letters in the plaintexts by a key value $k$. It can be viewed a special case of the Vigenere cipher, where the key is of legth $1$. The encryption rule is
+$$e(x_{i}) = (x + k) \;(\bmod\; 26), \forall i$$
 
-The Affine cypher has the following properties:
+\subsubsection*{Permutation cipher}
+Also called the simple substitution cipher, it has been in use for many hundreds of years. It basically consists of substituting every plaintext character for a different ciphertext character. It differs from the Caesar cipher in that the cipher alphabet is not simply the alphabet shifted, it is completely jumbled. The key for this cipher is simply a jumbled alphabet. For example a key $K = AJPCZWRLFBDKOTYUQGENHXMIVS$ would impose the following encryption rule
+$$ABCDEFGHIJKLMNOPQRSTUVWXYZ \rightarrow AJPCZWRLFBDKOTYUQGENHXMIVS,$$
+meaning a letter in the left string would encrypt into a letter in the right string that is in the same place. For example $M$ would encrypt to $T$.
 
-\begin{itemize}
-	\item 
-\end{itemize}
+\subsubsection*{Playfair cipher}
+The Playfair cipher is a digraph substitution cipher from the 19th century that was also used in the World War 1 by the British forces. It encrypts pairs (digraphs) of letters using a key square. Again the full description of the encryption is too long to include in this report.\\
+\\
+TODO: Add descriptions if necesary.
 
-
-\begin{itemize}
-	\item Ceasar cypher
-	\item Vigenere cypher
-	\item Affine cypher
-	\item itd.
-\end{itemize}
-
-I encrypted each plaintext with every encryption algorithm. This way I got n000 cypherthexts, 1000 for each of the choseng encrytion algorithms.
 
 \section*{Feature engineering}
-The first idea was to just use letters in a cyphertext as features (the first letter is the first feature, the second letter the second feature, etc...) and than use deep learning (a neural network with a lot of hiddent layers) as the model. Hopefully the neural network would discover some interesting patterns and correlations in the data, that would allow it to distinguish beetween different cyphertexts. Setting up such a network is not an easy task and there is no guarantee that this method will work either, since it has not been tried in this domain yet to my knowledge. So after some initial runs of the neural network and getting really bad results I focused on engeniring useful features that would make the job easier for the classfier. \\
-Taking into account the properties of the encryption algorithms used I extracted the following features from the cyphertexts:
+%The first idea was to just use letters in a ciphertext as features (the first letter is the first feature, the second letter the second feature, etc...) and than use deep learning (a neural network with a lot of hiddent layers) as the model. Hopefully the neural network would discover some interesting patterns and correlations in the data, that would allow it to distinguish beetween different ciphertexts. Setting up such a network is not an easy task and there is no guarantee that this method will work either, since it has not been tried in this domain yet to my knowledge. So after some initial runs of the neural network and getting really bad results I focused on engeniring useful features that would make the job easier for the classfier. \\
+TODO: Write a short introduction about the importance of features and what was your reasoning for choosing the ones you did. You should quote here the most.
+Taking into account the properties of the encryption algorithms used, I extracted the following features from the ciphertexts:
 
-\begin{itemize}
-	\item TODO: insert usefull feature here :)
-\end{itemize}
+\subsubsection*{Distribution of letters}
+\subsubsection*{Adjacent duplicates}
+\subsubsection*{Repeating digrams}
+\subsubsection*{Index of coincidence}
 
-\section*{ML techniques used}
-TODO: Describe the architecture of the NN, the activation function you used. Maybe you will do a one vs one classification i.e. for each class you train an individual NN classifier. You feed the new sample into each NN and than join results (use the normalization from OZIP).
+\section*{Exploratory data analysis}
+TODO: Include some graphs to show if chosen features are good and can be used to distinguish between the classes. Do a clustering study. Show scatterplots, bargraphs.
+
+\section*{Random forest classifier}
+TODO: Describe in a simple way the workings of a random forest classifier. Describe what parameters you used.
 
 
 \section*{Results}
