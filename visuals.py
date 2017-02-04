@@ -7,6 +7,14 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.decomposition import PCA
 from sklearn.preprocessing import LabelEncoder
 from sklearn.model_selection import train_test_split
+from sklearn.manifold import MDS
+import matplotlib.patches as mpatches
+
+def subsample(X, labels, sample_size=1):
+    le = LabelEncoder()
+    labels = le.fit_transform(labels)
+    _, X_sub, _, labels_sub = train_test_split(X, labels, test_size=sample_size)
+    return X_sub, le.inverse_transform(labels_sub)
 
 def dim_reduction(X):
     ss = StandardScaler()
@@ -14,11 +22,24 @@ def dim_reduction(X):
     X = pca.fit_transform(ss.fit_transform(X))
     return X
 
-def plot_scatter_2d(data, labels, subsample=1):
+def mds(X):
+    ss = StandardScaler()
+    mds = MDS(n_jobs=-1)
+    X = mds.fit_transform(ss.fit_transform(X))
+    return X
+
+def plot_scatter_2d(X, labels):
     le = LabelEncoder()
     labels = le.fit_transform(labels)
-    _, X_test, _, y_test = train_test_split(X, labels, test_size=subsample, random_state=42)
-    plt.scatter(X_test[:,0], X_test[:,1], s=10, c=y_test, alpha=0.5)
+    unique_num_labels = np.unique(labels)
+    unique_labels = le.inverse_transform(unique_num_labels)
+    print(unique_num_labels)
+    print(unique_labels)
+    colors=['b','g','r','c','m','y']
+    plt.scatter(X[:,0], X[:,1], s=75, c=[colors[i] for i in labels], alpha=0.5)
+    # patches = mpatches.Patch(color=all_lables, label=le.inverse_transform(all_lables))
+    plt.legend(handles=[mpatches.Patch(color=colors[i], label=unique_labels[i]) for i in unique_num_labels])
+    plt.legend()
     plt.show()
 
 def draw_distributions(dist_of_letters, labels):
@@ -54,6 +75,19 @@ def plot_bar(counts, labels, title, log_scale=False):
     plt.grid()
     plt.show()
 
+def plot_accuracy_score():
+    labels = [10, 50, 100, 500, 1000, 2000, 3000, 4000, 5000]
+    accuracy = [0.829378317614, 0.862716103369, 0.876875448497, 0.888757423716, 0.893335566778,
+                0.896674552443, 0.893135477295, 0.89605345238, 0.893343807012]
+    y_pos = np.arange(len(labels))
+    plt.xticks(y_pos, labels)
+    plt.plot(accuracy)
+    plt.grid()
+    plt.ylabel('Percantage of samples correctly classified')
+    plt.xlabel('Number of descision trees')
+    plt.title('Accuracy score')
+    plt.show()
+
 if __name__ == '__main__':
     cyphertexts = np.load('./data/cyphertexts.npy')
     labels = np.load('./data/labels.npy')
@@ -73,7 +107,12 @@ if __name__ == '__main__':
     # ios = index_of_coincidence(cyphertexts)
     # plot_bar(ios, labels, "Index of coincidence.")
 
-    X = np.load('./data/X.npy')
-    X = dim_reduction(X)
-    plot_scatter_2d(X, labels)
+    # X = np.load('./data/X.npy')
+    # X, labels = subsample(X, labels, sample_size=0.1)
+    #
+    # X = dim_reduction(X)
+    # X = mds(X)
+    # plot_scatter_2d(X, labels)
+
+    plot_accuracy_score()
 

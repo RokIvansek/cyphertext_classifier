@@ -94,8 +94,6 @@ The Playfair cipher is a digraph substitution cipher from the 19th century that 
 
 \section*{Feature engineering}
 %The first idea was to just use letters in a ciphertext as features (the first letter is the first feature, the second letter the second feature, etc...) and than use deep learning (a neural network with a lot of hiddent layers) as the model. Hopefully the neural network would discover some interesting patterns and correlations in the data, that would allow it to distinguish beetween different ciphertexts. Setting up such a network is not an easy task and there is no guarantee that this method will work either, since it has not been tried in this domain yet to my knowledge. So after some initial runs of the neural network and getting really bad results I focused on engeniring useful features that would make the job easier for the classfier. \\
-\textcolor{red}{TODO: Write a short introduction about the importance of features and what was your reasoning for choosing the ones you did. You should quote when necesary.}\\
-\\
 In order to express patterns in the cyphertexts I had to come up with interesting features. A feature is in essence any property of the cyphertexts that can be expressed in a qualitative or a quanititative way. The features that I decided to use are closely related to the properties of the cyphers I choose. They are mostly quantitative measurements that are used, when one attempts to break the chosen cyphers.
 
 \subsubsection*{Distribution of letters}
@@ -167,19 +165,47 @@ where $f_{i}$ are the frequencies of letters in $x$ and $d$ is the length of $x$
 The IC of an English plaintext is approximately $0.065$. The Affine, Caesar and Permutation ciphers are examples of single letter substitution ciphers, where the mapping that determines the encrypion of letters is bijective (one-to-one). It is therefore no surprise that the IC of their ciphertexts is the same as the IC of the English plaintexts.
 
 \section*{Exploratory data analysis}
-TODO: Include some graphs to show if chosen features are good and can be used to distinguish between the classes. Do a clustering study. Show scatterplots, bargraphs.
+\textcolor{red}{TODO: Include some graphs to show if chosen features are good and can be used to distinguish between the classes. Do a clustering study. Show scatterplots, bargraphs. Consider ploting variable corelations. https://www.mathworks.com/help/econ/corrplot.html}\\
+\\
+One common step before moving on to actual training of the model, is to draw some rough graphs representing the data that will be used for training. This is to see how features interact with each other and to get an idea of how the data clusters.\\
+\\
+Here I present just one graph to show that the chosen features separate the data in a clear way. I use a subsample of $10\%$ of the data. The features were scaled zero mean and unit variance, and then multidimensional scalling was used to shrink down the data to two dimensions.
+
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}[h]{0.5\textwidth}
+        \centering
+        \includegraphics[height=2.5in]{img/mds_features.png}
+    \end{subfigure}
+    \caption{MDS(multidimensional scaling) used on a subsample of the data.}
+    \label{fig:mds}
+\end{figure}
+
+From graph \ref{fig:mds} we can see how the ADFGVX cipher is clearly separated from the others. Vigenere and Playifair appearing in the inner circles are also separable from the other ciphers, while the Affine, Ceasar and Permutation cipher all lay mixed together in the outher most circle. This is an encouraging sight. It tells us that the classifier should produce good results.
 
 \section*{Random forest classifier}
-TODO: Describe in a simple way the workings of a random forest classifier. Describe what parameters you used.
+Random forest is an ensemble method. It works by building multiple simple desicion trees on different subsamples of the data and than combining the results produce a stronger model. It can be used for classification or regression. I will not go into detail about the workings of the descision tree and random forest techniques, since this is a broad topic and it is not the main focus of this report. I advise the reader to learn more in \cite{breiman2001random}. For now it suffices to say that this is a robust machine learning technique that works well on different domains in data science. The main parameter of the random forest is the number of decision trees built. It generally holds that more is better and we usually just build as much trees as our computing capabilities allow us, but the accuracy of the model is expected to stop improving substantially at some point.
 
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}[h]{0.5\textwidth}
+        \centering
+        \includegraphics[height=2.5in]{img/accuracy_rf.png}
+    \end{subfigure}
+    \caption{Determining the optimal number of decision trees in the random forest.}
+    \label{fig:acc_rf}
+\end{figure}
+
+On graph \ref{fig:acc_rf} we can see how the accuracy score of the random forest changes as we increase the number of descision trees in the forest. We can see that the accuracy of the model does not change significantly for more that $2000$ decision trees. The score was calculated on the training set using a $5$-fold cross validation. 
 
 \section*{Results}
-TODO: Present the prediction results (accuracy) in different ways. Using different metrics (total accuracy, tp, fp, tn, fn, ...)...
-
+\textcolor{red}{TODO: Present the prediction results (accuracy) in different ways. Using different metrics (total accuracy, tp, fp, tn, fn, ...)...}
+Training a random forest on the train portion of the data, building $2000$ decision trees, I obtained an accuracy of $0.9158$.
+\textcolor{red}{TODO: Show sklearn classification report in a table. Explain what the metrics mean. Comment on results. Also determine misclassification of Affine, Ceasar and Permutation cyphers and show this in a table.}
 
 \section*{Comments}
-TODO: Comment on the prediction results. Is your method a good one?
-TODO: Cite sklearn, Stinsons book, practical cryptography website, matplotlib, pycipher library.
+\textcolor{red}{TODO: Comment on the prediction results. Is your method a good one?}
+\textcolor{red}{TODO: Cite sklearn, Stinsons book, practical cryptography website, matplotlib, pycipher} library.
 
 \bibliographystyle{plain}
 \bibliography{sample}

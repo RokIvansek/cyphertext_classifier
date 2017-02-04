@@ -1,4 +1,5 @@
 import numpy as np
+from suffix_trees import STree
 
 def import_data():
     cyphertexts = np.load('./data/cyphertexts.npy')

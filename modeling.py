@@ -3,7 +3,8 @@ from sklearn.neural_network import MLPClassifier
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import LabelEncoder
-from sklearn.metrics import accuracy_score
+from sklearn.metrics import accuracy_score, classification_report
+from sklearn.model_selection import cross_val_score
 
 def train_classifier_and_predict():
     X = np.load('./data/X.npy')
@@ -16,11 +17,17 @@ def train_classifier_and_predict():
     # clf.fit(X_train, y_train)
     # pred = clf.predict(X_test)
 
-    rf = RandomForestClassifier(n_estimators=1000, criterion='entropy', n_jobs=-1)
+    # for n in [5000]:
+    #     rf = RandomForestClassifier(n_estimators=n, criterion='entropy', n_jobs=-1)
+    #     scores = cross_val_score(rf, X_train, y_train, cv=5, scoring='accuracy')
+    #     print(n, "trees accuracy score:", np.mean(scores))
+
+    rf = RandomForestClassifier(n_estimators=2000, criterion='entropy', n_jobs=-1)
     rf.fit(X_train, y_train)
     pred = rf.predict(X_test)
-
     print(accuracy_score(y_test, pred))
+    print(classification_report(y_test, pred, target_names=le.inverse_transform(np.arange(len(np.unique(y))))))
+
     # print(le.inverse_transform(y_test))
     # print(le.inverse_transform(pred))
 
