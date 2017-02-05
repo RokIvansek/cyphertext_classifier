@@ -56,7 +56,7 @@ For my plaintexts I randomly choose 1000 texts from the 20 Newsgroups dataset. I
 
 In addition to the preprocessing already made, I took out the white spaces and trimmed the texts to length of $500$ characters. This way I got $1000$ strings of length $500$, each representing a part of a randomly selected text from the dataset. This strings were my plaintexts used in the analysis.
 
-\subsection*{ciphertexts}
+\subsection*{Ciphertexts}
 To encrypt the plaintexts I used the python library pycipher \cite{pycipher}. To make the classification task as representative as possible, I tried to choose a variety of different ciphers. Including some that would produce similar ciphertexts, like the Permutation and Caesar cipher and some whose ciphertexts are clearly distinguishable from each other, like the ADFGVX and the Vigenere cipher. While encrypting the key of the cipher was always chosen randomly out of all possible combinations, except where stated differently. I encrypted each plaintext with every chosen cipher. This way I got $6000$ cipherthexts, a $1000$ for each of the chosen ciphers. I ended up choosing the following ciphers.\\
 \\
 In the description of the ciphers I will always assume that $x = (x_{1}, x_{2}, ...,x_{m})$ is a plaintext consisting of $m$ integers from $\mathbb{Z}_{26}$ which map to letters in the english alphabet.
