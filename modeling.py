@@ -3,7 +3,7 @@ from sklearn.neural_network import MLPClassifier
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import LabelEncoder
-from sklearn.metrics import accuracy_score, classification_report
+from sklearn.metrics import accuracy_score, classification_report, confusion_matrix
 from sklearn.model_selection import cross_val_score
 
 def train_classifier_and_predict():
@@ -28,6 +28,12 @@ def train_classifier_and_predict():
     print(accuracy_score(y_test, pred))
     print(classification_report(y_test, pred, target_names=le.inverse_transform(np.arange(len(np.unique(y))))))
 
+    # for cipher in ['affine', 'ceasar', 'permutation']:
+    #     indices = y_test == cipher
+    #     predictions = pred[indices]
+    #     misclasifided_as = [(a, predictions[]) for a in np.unique(pred)]
+
+    print(confusion_matrix(y_test, pred))
     # print(le.inverse_transform(y_test))
     # print(le.inverse_transform(pred))
 
