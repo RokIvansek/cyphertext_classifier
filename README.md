@@ -1,2 +1,4 @@
 # cyphertext_classifier
-Classifying cyphertexts using random forest classifier.
+Classifying classical cyphertexts using random forest classifier.
+
+For more info read the report.
