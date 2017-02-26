@@ -96,7 +96,7 @@ The Playfair cipher is a digraph substitution cipher from the 19th century that 
 %The first idea was to just use letters in a ciphertext as features (the first letter is the first feature, the second letter the second feature, etc...) and than use deep learning (a neural network with a lot of hiddent layers) as the model. Hopefully the neural network would discover some interesting patterns and correlations in the data, that would allow it to distinguish beetween different ciphertexts. Setting up such a network is not an easy task and there is no guarantee that this method will work either, since it has not been tried in this domain yet to my knowledge. So after some initial runs of the neural network and getting really bad results I focused on engeniring useful features that would make the job easier for the classfier. \\
 In order to express patterns in the ciphertexts we have to come up with interesting features. A feature is in essence any property of the ciphertexts that can be expressed in a qualitative or a quantitative way. The features that we decided to use are closely related to the properties of the chosen ciphers. They are mostly quantitative measurements that are used, when one attempts to break the chosen ciphers.
 
-\subsubsection{Distribution of letters}
+\subsection{Distribution of letters}
 The first most simple group of features one can extract is the distribution of letters. This just means that we count, how many times each letter appears in the ciphertext. This way we obtain $26$ features, one for each letter in the alphabet. Using only this simple group of features we would already be able to distinguish between some of the ciphers that use only a subset of letters from the alphabet, like the ADFGVX from other ciphers that use the whole alphabet.
 
 \begin{figure}[H]
@@ -115,7 +115,7 @@ The first most simple group of features one can extract is the distribution of l
     \label{fig:letter_dist}
 \end{figure}
 
-\subsubsection{Adjacent duplicates}
+\subsection{Adjacent duplicates}
 Another simple feature that proved to be efficient in a similar ciphertexts classification task \cite{sivagurunathan2010classification} is the number of adjacent duplicates. It is particular useful when recognizing the Playfair cipher, since this cipher should have a substantially lower number of adjacent duplicates than other ciphers, due to its encryption rule.
 
 \begin{figure}[H]
@@ -128,7 +128,7 @@ Another simple feature that proved to be efficient in a similar ciphertexts clas
     \label{fig:adj_dups}
 \end{figure}
 
-\subsubsection{Repeating bigrams}
+\subsection{Repeating bigrams}
 In a classical text classification an $n$-gram (usually a bigram) is a sequence of $n$ adjacent tokens in a text. Tokens can be words, syllables or letters. Using bigrams of letters I extracted two features. First was the number of unique bigrams that repeat at least once in a ciphertext and second was the frequency of the most frequent bigram in a ciphertext.
 
 \begin{figure}[H]
@@ -147,7 +147,7 @@ In a classical text classification an $n$-gram (usually a bigram) is a sequence 
     \label{fig:bigrams}
 \end{figure}
 
-\subsubsection{Index of coincidence}
+\subsection{Index of coincidence}
 The index of coincidence (IC) along with Kasiski's test is used in breaking the Vigenere cipher. It tells us the probability that we will get two matching letters, if we randomly select two letters from a given text. The formula for calculating the IC for a text $x$ is
 $$\mbox{IC}(x) = \sum_{i=0}^{25} \frac{f_{i}(f_{i}-1)}{d(d-1)}, $$
 where $f_{i}$ are the frequencies of letters in $x$ and $d$ is the length of $x$.
